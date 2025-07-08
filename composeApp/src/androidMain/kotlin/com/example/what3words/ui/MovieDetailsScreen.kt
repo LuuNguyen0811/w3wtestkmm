@@ -89,11 +89,9 @@ fun MovieDetailsScreen(
                 textAlign = TextAlign.Center
             )
         } else {
-            // Use movieDetails if available, otherwise fallback to basic movie info
             val details = movieDetails
             val baseImageUrl = "https://image.tmdb.org/t/p/w500"
             
-            // Movie poster
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -119,7 +117,6 @@ fun MovieDetailsScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Movie title
             Text(
                 text = details?.title ?: movie.title,
                 style = MaterialTheme.typography.headlineMedium,
@@ -128,7 +125,6 @@ fun MovieDetailsScreen(
                 textAlign = TextAlign.Center
             )
             
-            // Original title if different
             if (details?.originalTitle != null && details.originalTitle != details.title) {
                 Text(
                     text = "Original: ${details.originalTitle}",

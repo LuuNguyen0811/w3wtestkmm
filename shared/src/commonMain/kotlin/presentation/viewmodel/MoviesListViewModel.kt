@@ -29,7 +29,6 @@ class MoviesListViewModel() : CoroutineViewModel(), KoinComponent {
     private val _uiState = MutableStateFlow(MoviesUiState())
     val uiState: StateFlow<MoviesUiState> = _uiState.asStateFlow()
     
-    private val scope = CoroutineScope(Dispatchers.IO)
     private var searchJob: Job? = null
 
     init {
@@ -37,7 +36,7 @@ class MoviesListViewModel() : CoroutineViewModel(), KoinComponent {
     }
 
     fun loadTrendingMovies() {
-        scope.launch {
+        coroutineScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true, 
                 error = null,
@@ -71,7 +70,7 @@ class MoviesListViewModel() : CoroutineViewModel(), KoinComponent {
             return
         }
         
-        searchJob = scope.launch {
+        searchJob = coroutineScope.launch {
             delay(300)
             
             _uiState.value = _uiState.value.copy(
@@ -113,8 +112,8 @@ class MoviesListViewModel() : CoroutineViewModel(), KoinComponent {
             isLoadingDetails = true,
             detailsError = null
         )
-        
-        scope.launch {
+
+        coroutineScope.launch {
             try {
                 val movieDetails = getMovieDetailsUseCase(movie.id)
                 _uiState.value = _uiState.value.copy(
