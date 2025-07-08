@@ -1,5 +1,6 @@
 package presentation.viewmodel
 
+import core.utils.CoroutineViewModel
 import data.model.Movie
 import data.model.MovieDetails
 import domain.GetTrendingMoviesUseCase
@@ -14,24 +15,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import presentation.uimodel.MoviesUiState
 
-data class MoviesUiState(
-    val movies: List<Movie> = emptyList(),
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val searchQuery: String = "",
-    val isSearchMode: Boolean = false,
-    val listHeader: String = "Trending movies",
-    val selectedMovie: Movie? = null,
-    val showMovieDetails: Boolean = false,
-    val movieDetails: MovieDetails? = null,
-    val isLoadingDetails: Boolean = false,
-    val detailsError: String? = null
-)
-
-class MoviesListViewModel() : KoinComponent {
+class MoviesListViewModel() : CoroutineViewModel(), KoinComponent {
     private val getTrendingMoviesUseCase: GetTrendingMoviesUseCase by inject()
     private val searchMoviesUseCase: SearchMoviesUseCase by inject()
     private val getMovieDetailsUseCase: GetMovieDetailsUseCase by inject()
@@ -149,5 +139,12 @@ class MoviesListViewModel() : KoinComponent {
             isLoadingDetails = false,
             detailsError = null
         )
+    }
+
+    // For IOS
+    fun observeMovies(onChange: (MoviesUiState) -> Unit) {
+        uiState.onEach {
+            onChange(it)
+        }.launchIn(coroutineScope)
     }
 } 
