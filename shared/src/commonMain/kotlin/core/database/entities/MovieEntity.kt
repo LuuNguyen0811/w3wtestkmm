@@ -3,6 +3,7 @@ package core.database.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import core.utils.getCurrentTimeMili
 import data.model.Movie
 
 @Entity(tableName = "movies")
@@ -44,7 +45,7 @@ fun Movie.toMovieEntity(cacheType: String): MovieEntity {
         voteAverage = voteAverage,
         posterPath = posterPath,
         backdropPath = backdropPath,
-        cachedTimestamp = System.currentTimeMillis(),
+        cachedTimestamp = getCurrentTimeMili(),
         cacheType = cacheType
     )
 } 

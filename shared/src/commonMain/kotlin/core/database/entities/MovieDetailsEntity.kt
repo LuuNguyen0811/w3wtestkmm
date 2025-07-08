@@ -3,6 +3,7 @@ package core.database.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import core.utils.getCurrentTimeMili
 import data.model.MovieDetails
 import data.model.Genre
 import data.model.ProductionCompany
@@ -118,7 +119,7 @@ fun MovieDetails.toMovieDetailsEntity(): MovieDetailsEntity {
         productionCompaniesJson = serializeProductionCompanies(productionCompanies),
         productionCountriesJson = serializeProductionCountries(productionCountries),
         spokenLanguagesJson = serializeSpokenLanguages(spokenLanguages),
-        cachedTimestamp = System.currentTimeMillis()
+        cachedTimestamp = getCurrentTimeMili()
     )
 }
 

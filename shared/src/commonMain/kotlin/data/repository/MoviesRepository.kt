@@ -2,36 +2,35 @@ package data.repository
 
 import core.database.MoviesDatabase
 import core.database.entities.toMovie
-import core.database.entities.toMovieEntity
 import core.database.entities.toMovieDetails
 import core.database.entities.toMovieDetailsEntity
+import core.database.entities.toMovieEntity
 import core.network.W3wNetworkDataSource
-import core.network.model.NetworkMovieDetails
 import core.network.model.NetworkGenre
+import core.network.model.NetworkMovieDetails
 import core.network.model.NetworkProductionCompany
 import core.network.model.NetworkProductionCountry
 import core.network.model.NetworkSpokenLanguage
+import core.utils.getCurrentTimeMili
+import data.model.Genre
 import data.model.Movie
 import data.model.MovieDetails
-import data.model.Genre
 import data.model.ProductionCompany
 import data.model.ProductionCountry
 import data.model.SpokenLanguage
 
 class MoviesRepository(
-    private val networkDataSource: W3wNetworkDataSource,
-    private val database: MoviesDatabase
+    private val networkDataSource: W3wNetworkDataSource, private val database: MoviesDatabase
 ) {
     companion object {
         private const val CACHE_VALIDITY_DURATION = 30 * 60 * 1000L // 30 minutes
         private const val TRENDING_CACHE_TYPE = "trending"
-        private const val SEARCH_CACHE_TYPE = "search"
     }
 
     suspend fun getTrendingMovies(): List<Movie> {
-        val validTimestamp = System.currentTimeMillis() - CACHE_VALIDITY_DURATION
+        val validTimestamp = getCurrentTimeMili() - CACHE_VALIDITY_DURATION
         val cachedMovies = database.movieDao().getCachedMovies(TRENDING_CACHE_TYPE, validTimestamp)
-        
+
         if (cachedMovies.isNotEmpty()) {
             return cachedMovies.map { it.toMovie() }
         }
@@ -48,11 +47,11 @@ class MoviesRepository(
                     backdropPath = networkMovie.backdropPath
                 )
             }
-            
+
             // Cache the movies
             database.movieDao().clearMoviesByType(TRENDING_CACHE_TYPE)
             database.movieDao().insertMovies(movies.map { it.toMovieEntity(TRENDING_CACHE_TYPE) })
-            
+
             movies
         } catch (e: Exception) {
             emptyList()
@@ -78,9 +77,9 @@ class MoviesRepository(
     }
 
     suspend fun getMovieDetails(movieId: Int): MovieDetails? {
-        val validTimestamp = System.currentTimeMillis() - CACHE_VALIDITY_DURATION
+        val validTimestamp = getCurrentTimeMili() - CACHE_VALIDITY_DURATION
         val cachedMovieDetails = database.movieDao().getCachedMovieDetails(movieId, validTimestamp)
-        
+
         if (cachedMovieDetails != null) {
             return cachedMovieDetails.toMovieDetails()
         }
@@ -88,10 +87,10 @@ class MoviesRepository(
         return try {
             val networkMovieDetails = networkDataSource.getMovieDetails(movieId)
             val movieDetails = networkMovieDetails.toMovieDetails()
-            
+
             // Cache the movie details
             database.movieDao().insertMovieDetails(movieDetails.toMovieDetailsEntity())
-            
+
             movieDetails
         } catch (e: Exception) {
             null
@@ -99,7 +98,7 @@ class MoviesRepository(
     }
 
     suspend fun clearExpiredCache() {
-        val expiredTimestamp = System.currentTimeMillis() - CACHE_VALIDITY_DURATION
+        val expiredTimestamp = getCurrentTimeMili() - CACHE_VALIDITY_DURATION
         database.movieDao().clearExpiredMovies(expiredTimestamp)
         database.movieDao().clearExpiredMovieDetails(expiredTimestamp)
     }
@@ -110,7 +109,6 @@ class MoviesRepository(
     }
 }
 
-// Extension function to convert NetworkMovieDetails to MovieDetails
 private fun NetworkMovieDetails.toMovieDetails(): MovieDetails {
     return MovieDetails(
         id = id,
@@ -136,8 +134,7 @@ private fun NetworkMovieDetails.toMovieDetails(): MovieDetails {
         genres = genres.map { it.toGenre() },
         productionCompanies = productionCompanies.map { it.toProductionCompany() },
         productionCountries = productionCountries.map { it.toProductionCountry() },
-        spokenLanguages = spokenLanguages.map { it.toSpokenLanguage() }
-    )
+        spokenLanguages = spokenLanguages.map { it.toSpokenLanguage() })
 }
 
 private fun NetworkGenre.toGenre(): Genre {
@@ -146,10 +143,7 @@ private fun NetworkGenre.toGenre(): Genre {
 
 private fun NetworkProductionCompany.toProductionCompany(): ProductionCompany {
     return ProductionCompany(
-        id = id,
-        name = name,
-        logoPath = logoPath,
-        originCountry = originCountry
+        id = id, name = name, logoPath = logoPath, originCountry = originCountry
     )
 }
 
@@ -159,8 +153,6 @@ private fun NetworkProductionCountry.toProductionCountry(): ProductionCountry {
 
 private fun NetworkSpokenLanguage.toSpokenLanguage(): SpokenLanguage {
     return SpokenLanguage(
-        englishName = englishName,
-        iso6391 = iso6391,
-        name = name
+        englishName = englishName, iso6391 = iso6391, name = name
     )
 }

@@ -1,6 +1,6 @@
 package core.di
 
-import core.presentation.MoviesListViewModel
+import presentation.viewmodel.MoviesListViewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {

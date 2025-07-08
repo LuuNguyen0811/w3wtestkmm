@@ -1,4 +1,4 @@
-package core.presentation
+package presentation.viewmodel
 
 import data.model.Movie
 import data.model.MovieDetails
@@ -124,7 +124,6 @@ class MoviesListViewModel() : KoinComponent {
             detailsError = null
         )
         
-        // Load movie details
         scope.launch {
             try {
                 val movieDetails = getMovieDetailsUseCase(movie.id)

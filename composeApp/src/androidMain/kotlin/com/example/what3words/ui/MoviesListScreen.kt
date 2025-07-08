@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import core.presentation.MoviesListViewModel
+import presentation.viewmodel.MoviesListViewModel
 import data.model.Movie
 
 @Composable
@@ -49,7 +49,6 @@ fun MoviesListScreen() {
         )
         return
     }
-
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         OutlinedTextField(
             value = uiState.searchQuery,
@@ -58,14 +57,14 @@ fun MoviesListScreen() {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         Text(
             text = uiState.listHeader,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        
+
         when {
             uiState.isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
